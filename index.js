@@ -1,3 +1,6 @@
+//import tic from "tic.js"
+const tic = require('./tic')
+tic.hello()
 const express = require('express');
 const { createServer } = require('node:http');
 const { join } = require('node:path');
@@ -44,6 +47,10 @@ async function main() {
     res.sendFile(join(__dirname, 'index.html'));
   });
 
+  app.get('/tic', (req, res) => {
+    res.sendFile(join(__dirname, 'tic.html'));
+  });
+
   io.on('connection', async (socket) => {
     socket.on('chat message', async (msg, clientOffset, callback) => {
       let result;
@@ -80,6 +87,9 @@ async function main() {
   server.listen(port, () => {
     console.log(`server running at http://localhost:${port}`);
   });
+  // server.listen(3000, () => {
+  //   console.log('server running at http://localhost:3000');
+  // });
 }
 
 main();
