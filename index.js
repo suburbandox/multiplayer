@@ -1,120 +1,85 @@
 const express = require('express');
 const { createServer } = require('node:http');
-const { readFileSync } = require('fs')
 const { join } = require('node:path');
 const { Server } = require('socket.io');
+const sqlite3 = require('sqlite3');
+const { open } = require('sqlite');
+const { availableParallelism } = require('node:os');
+const cluster = require('node:cluster');
+const { createAdapter, setupPrimary } = require('@socket.io/cluster-adapter');
 
-const app = express();
-const server = createServer(app);
-const io = new Server(server, {
-  connectionStateRecovery: {}
-});
-app.get('/', (req, res) => {
-  const indexData = readFileSync('index.html')
-  res.sendFile(join(__dirname, 'index.html'));
-  //res.send(indexData.toString());
-  //res.send('<h1>Hello razzi</h1>');
-});
-
-io.on('connection', (socket) => {
-  console.log('a user connected');
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
-  });
-});
-
-io.on('connection', (socket) => {
-  socket.on('chat message', (msg) => {
-    console.log('message: ' + msg);
-  });
-});
-
-// io.on('connection', (socket) => {
-//   socket.broadcast.emit('hi');
-// });
-
-io.on('connection', (socket) => {
-  socket.on('chat message', (msg) => {
-    io.emit('chat message', msg);
-  });
-});
-
-// this will emit the event to all connected sockets
- io.emit('hello7', 'world'); 
-
-//from server
-// io.on('connection', (socket) => {
-//   socket.emit('hello', 'world7');
-// });
-
-//to server
-// io.on('connection', (socket) => {
-//   socket.on('hello', (arg) => {
-//     console.log(arg); // 'world'
-//   });
-// });
-//to server
-// io.on('connection', (socket) => {
-//   socket.on('hello2', (arg1, arg2, arg3) => {
-//     console.log(arg1); // 1
-//     console.log(arg2); // '2'
-//     console.log(arg3); // { 3: '4', 5: <Buffer 06> }
-//   });
-// });
-//from server
-// io.on('connection', (socket) => {
-//   socket.emit('hello2', 1, '2', { 3: '4', 5: Buffer.from([6]) });
-// });
-//to server
-// io.on('connection', (socket) => {
-//   socket.on('request', (arg1, arg2, callback) => {
-//     console.log(arg1); // { foo: 'bar' }
-//     console.log(arg2); // 'baz'
-//     callback({
-//       status: 'ok'
-//     });
-//   });
-// });
-//from server
-// io.on('connection', (socket) => {
-//   socket.timeout(5000).emit('request2', { foo: 'bar' }, 'baz', (err, response) => {
-//     if (err) {
-//       // the client did not acknowledge the event in the given delay
-//     } else {
-//       console.log(response.status); // 'ok'
-//     }
-//   });
-// });
-// io.on('connection', async (socket) => {
-//   try {
-//     const response = await socket.timeout(5000).emitWithAck('request', { foo: 'bar' }, 'baz');
-//     console.log(response.status); // 'ok'
-//   } catch (e) {
-//     // the client did not acknowledge the event in the given delay
-//   }
-// });
-
-// io.on('connection', (socket) => {
-//   socket.on('request', (arg1, arg2, callback) => {
-//     console.log(arg1); // { foo: 'bar' }
-//     console.log(arg2); // 'baz'
-//     callback({
-//       status: 'ok'
-//     });
-//   });
-// });
-io.on('connection', (socket) => {
-  socket.emit('hello', 1, '2', { 3: '4', 5: Uint8Array.from([6]) });
-});
-io.on('connection', async (socket) => {
-  try {
-    const response = await socket.timeout(5000).emitWithAck('request', { foo: 'bar' }, 'baz');
-    console.log(response.status); // 'ok'
-  } catch (e) {
-    // the client did not acknowledge the event in the given delay
+if (cluster.isPrimary) {
+  const numCPUs = availableParallelism();
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork({
+      PORT: 3000 + i
+    });
   }
-});
 
-server.listen(3000, () => {
-  console.log('server running at http://localhost:3000');
-});
+  return setupPrimary();
+}
+
+async function main() {
+  const db = await open({
+    filename: 'chat.db',
+    driver: sqlite3.Database
+  });
+
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      client_offset TEXT UNIQUE,
+      content TEXT
+    );
+  `);
+
+  const app = express();
+  const server = createServer(app);
+  const io = new Server(server, {
+    connectionStateRecovery: {},
+    adapter: createAdapter()
+  });
+
+  app.get('/', (req, res) => {
+    res.sendFile(join(__dirname, 'index.html'));
+  });
+
+  io.on('connection', async (socket) => {
+    socket.on('chat message', async (msg, clientOffset, callback) => {
+      let result;
+      try {
+        result = await db.run('INSERT INTO messages (content, client_offset) VALUES (?, ?)', msg, clientOffset);
+      } catch (e) {
+        if (e.errno === 19 /* SQLITE_CONSTRAINT */ ) {
+          callback();
+        } else {
+          // nothing to do, just let the client retry
+        }
+        return;
+      }
+      io.emit('chat message', msg, result.lastID);
+      callback();
+    });
+
+    if (!socket.recovered) {
+      try {
+        await db.each('SELECT id, content FROM messages WHERE id > ?',
+          [socket.handshake.auth.serverOffset || 0],
+          (_err, row) => {
+            socket.emit('chat message', row.content, row.id);
+          }
+        )
+      } catch (e) {
+        // something went wrong
+      }
+    }
+  });
+
+  const port = process.env.PORT;
+
+  server.listen(port, () => {
+    console.log(`server running at http://localhost:${port}`);
+  });
+}
+
+main();
