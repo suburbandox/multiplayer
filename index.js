@@ -9,12 +9,12 @@ const sqlite3 = require('sqlite3');
 const { open } = require('sqlite');
 
 function tic(io){
+    let serverTurn =0
     io.on('connection', (socket) => {
-        socket.on('buttonpress', (dis) => {
-            console.log(dis)
-            dis =!dis
-            console.log(dis)
-            io.emit('buttonstate', dis);
+        io.emit("turn",serverTurn)
+        socket.on('buttonpress', () => {
+            serverTurn++
+            io.emit('buttonstate', serverTurn);
         });
       })
 }

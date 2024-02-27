@@ -7,6 +7,7 @@
 </head>
 <body>
     <h1 id="text">this is a game</h1>
+    <h1 id="text2">this is a game</h1>
     <button id="textbutton">button</button>
     <script src="/socket.io/socket.io.js"></script>
 
@@ -14,19 +15,28 @@
         const socket = io();
 
         const text = document.getElementById("text")
+        const text2 = document.getElementById("text2")
         const textbutton = document.getElementById("textbutton")
         const press =textbutton.addEventListener("click",Press)
-        let dis = false
 
+        let clientTurn =0
+        socket.on("turn",serverTurn => {
+            clientTurn =serverTurn
+        })
         function Press(){
-            textbutton.disabled = dis
-            socket.emit("buttonpress",dis)
+            textbutton.disabled = true
+            socket.emit("buttonpress","pressed")
+            clientTurn++
         }
-
-         socket.on('buttonstate', (msg) => {
-            console.log(msg)
-            dis = msg
+         socket.on('buttonstate', (serverTurn) => {
+            text.innerHTML = "server"+serverTurn
+            if(serverTurn > clientTurn){
+                textbutton.disabled=false
+                clientTurn =serverTurn
+            }
+            text2.innerHTML = "client"+clientTurn
        });
+
     </script>
 </body>
 </html>
