@@ -16,10 +16,17 @@
         const text = document.getElementById("text")
         const textbutton = document.getElementById("textbutton")
         const press =textbutton.addEventListener("click",Press)
+        let dis = false
 
         function Press(){
-            text.innerText="redrum"
+            textbutton.disabled = dis
+            socket.emit("buttonpress",dis)
         }
+
+         socket.on('buttonstate', (msg) => {
+            console.log(msg)
+            dis = msg
+       });
     </script>
 </body>
 </html>

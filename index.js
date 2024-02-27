@@ -1,6 +1,6 @@
-//import tic from "tic.js"
-const tic = require('./tic')
-tic.hello()
+
+
+
 const express = require('express');
 const { createServer } = require('node:http');
 const { join } = require('node:path');
@@ -8,6 +8,16 @@ const { Server } = require('socket.io');
 const sqlite3 = require('sqlite3');
 const { open } = require('sqlite');
 
+function tic(io){
+    io.on('connection', (socket) => {
+        socket.on('buttonpress', (dis) => {
+            console.log(dis)
+            dis =!dis
+            console.log(dis)
+            io.emit('buttonstate', dis);
+        });
+      })
+}
 async function main() {
   const db = await open({
     filename: 'chat.db',
@@ -24,10 +34,8 @@ async function main() {
 
   const app = express();
   const server = createServer(app);
-  const io = new Server(server, {
-    connectionStateRecovery: {},
-  });
-
+  const io = new Server(server)
+  tic(io)
   app.get('/', (req, res) => {
     res.sendFile(join(__dirname, 'index.html'));
   });
