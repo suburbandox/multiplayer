@@ -10,11 +10,22 @@ const { open } = require('sqlite');
 
 function tic(io){
     let serverTurn =0
+    let player=0
     io.on('connection', (socket) => {
+        player++
+        //console.log(player)
+        io.emit("playernum",player)
+        console.log("player"+ player+"joined")
+
         io.emit("turn",serverTurn)
         socket.on('buttonpress', () => {
             serverTurn++
             io.emit('buttonstate', serverTurn);
+        });
+        socket.on('disconnect', (e) => {
+          player--
+          console.log(e)
+          console.log("player"+ player+"left");
         });
       })
 }

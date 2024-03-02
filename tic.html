@@ -35,7 +35,11 @@
                 clientTurn =serverTurn
             }
             text2.innerHTML = "client"+clientTurn
-       });
+        });
+        socket.once('playernum', (playernum) => {
+            text.innerHTML = "player "+playernum
+        });
+
 
     </script>
 </body>
