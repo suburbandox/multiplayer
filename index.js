@@ -1,6 +1,3 @@
-
-
-
 const express = require('express');
 const { createServer } = require('node:http');
 const { join } = require('node:path');
@@ -29,7 +26,7 @@ function tic(io){
         });
       })
 }
-async function main() {
+async function chat(io) {
   const db = await open({
     filename: 'chat.db',
     driver: sqlite3.Database
@@ -43,17 +40,6 @@ async function main() {
     );
   `);
 
-  const app = express();
-  const server = createServer(app);
-  const io = new Server(server)
-  tic(io)
-  app.get('/', (req, res) => {
-    res.sendFile(join(__dirname, 'index.html'));
-  });
-
-  app.get('/tic', (req, res) => {
-    res.sendFile(join(__dirname, 'tic.html'));
-  });
 
   io.on('connection', async (socket) => {
     socket.on('chat message', async (msg, clientOffset, callback) => {
@@ -61,7 +47,7 @@ async function main() {
       try {
         result = await db.run('INSERT INTO messages (content, client_offset) VALUES (?, ?)', msg, clientOffset);
       } catch (e) {
-        if (e.errno === 19 /* SQLITE_CONSTRAINT */ ) {
+        if (e.errno === 19 /* SQLITE_CONSTRAINT */) {
           callback();
         } else {
           // nothing to do, just let the client retry
@@ -79,15 +65,35 @@ async function main() {
           (_err, row) => {
             socket.emit('chat message', row.content, row.id);
           }
-        )
+        );
       } catch (e) {
         // something went wrong
       }
     }
   });
+}
+async function main() {
+  const app = express();
+  const server = createServer(app);
+  const io = new Server(server)
+
+  await chat(io);
+  tic(io)
+
+  app.use(express.static('projects'));
+  app.get('/', (req, res) => {
+    res.sendFile(join(__dirname, 'projects/home/index.html'));
+  });
+
+  app.get('/tic', (req, res) => {
+    res.sendFile(join(__dirname, 'projects/tic/tic.html'));
+  });
+
+  app.get('/chat', (req, res) => {
+    res.sendFile(join(__dirname, 'projects/chat/chat.html'));
+  });
 
   const port = 3000;
-
   server.listen(port, () => {
     console.log(`server running at http://localhost:${port}`);
   });
