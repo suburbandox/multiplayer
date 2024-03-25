@@ -1,3 +1,32 @@
+const socket = io();
+
+const text = document.getElementById("text")
+const text2 = document.getElementById("text2")
+const textbutton = document.getElementById("textbutton")
+const press =textbutton.addEventListener("click",Press)
+
+let clientTurn =0
+socket.on("turn",serverTurn => {
+    clientTurn =serverTurn
+})
+function Press(){
+    textbutton.disabled = true
+    socket.emit("buttonpress","pressed")
+    clientTurn++
+}
+ socket.on('buttonstate', (serverTurn) => {
+    text.innerHTML = "server"+serverTurn
+    if(serverTurn > clientTurn){
+        textbutton.disabled=false
+        clientTurn =serverTurn
+    }
+    text2.innerHTML = "client"+clientTurn
+});
+socket.once('playernum', (playernum) => {
+    text.innerHTML = "player "+playernum
+});
+
+
 
 // function hello(){
 //     console.log("redrum")
@@ -5,7 +34,7 @@
 // module.exports = {
 //     hello: hello
 // };
-console.log("redhum123")
+//console.log("redhum123")
 
 var currentPlayer; // string
 var keepPlaying; // bool
@@ -19,6 +48,12 @@ const xs_and_os = document.getElementById("xs-and-os");
 const popup = document.getElementById("popup-container");
 const playAgainBtn = document.getElementById('play-button');
 const fin = document.getElementById('final-message');
+
+const t= "redrum"
+document.getElementById("arr").addEventListener("click",arr)
+function arr(){
+    console.log(board)
+}
 
 playAgainBtn.addEventListener("click",function(){
     keepPlaying =true;
@@ -34,6 +69,16 @@ playAgainBtn.addEventListener("click",function(){
     winner =false;
     popup.style.display = "none";
 });
+
+ticTacToeContainer.addEventListener("click",click)
+function click(){
+    setTimeout(function(){socket.emit("board",board)},1000)
+    //socket.emit("board",board)
+}
+socket.on("board",(b)=>{
+    //console.log(b)
+    board = b
+})
 
 function main() {
     currentPlayer = "X";

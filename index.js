@@ -14,6 +14,10 @@ function tic(io){
         io.emit("playernum",player)
         console.log("player"+ player+"joined")
 
+        socket.on('board',(board) => {
+          io.emit('board',board)
+        })
+
         io.emit("turn",serverTurn)
         socket.on('buttonpress', () => {
             serverTurn++
