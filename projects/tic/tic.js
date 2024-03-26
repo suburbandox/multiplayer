@@ -25,17 +25,21 @@ function Press(){
 socket.once('playernum', (playernum) => {
     text.innerHTML = "player "+playernum
 });
+let row2,col2
 
-
-
-// function hello(){
-//     console.log("redrum")
-// }
-// module.exports = {
-//     hello: hello
-// };
-//console.log("redhum123")
-
+socket.on("row",(r)=>{
+    console.log(r)
+    row2 =r
+})
+socket.on("col",(c)=>{
+    console.log(c)
+    col2 = c
+})
+socket.on("board",(b)=>{
+    console.log(b)
+    board = b
+    drawotherboard()
+})
 var currentPlayer; // string
 var keepPlaying; // bool
 var row, col; // int
@@ -54,6 +58,34 @@ document.getElementById("arr").addEventListener("click",arr)
 function arr(){
     console.log(board)
 }
+document.getElementById("reset").addEventListener("click",reset)
+function reset(){
+    console.log(444)
+    main()
+    clearboard()
+}
+function clearboard(){
+    keepPlaying =true;
+    turn = 0;
+    //board[row][col] ="";
+    for (var x = 0; x < board.length; x++) {
+        for (var y = 0; y < board[x].length; y++) {
+            board[x][y] = "";
+        }
+    
+    }
+    xs_and_os.innerHTML ="";
+    winner =false;
+    popup.style.display = "none";
+
+}
+function drawotherboard(){
+    console.log(row2)
+    console.log(col2)
+    //setTimeout(()=>{markBoard(row2,col2)},1000)
+    drawMark(row2,col2)
+}
+
 
 playAgainBtn.addEventListener("click",function(){
     keepPlaying =true;
@@ -74,11 +106,9 @@ ticTacToeContainer.addEventListener("click",click)
 function click(){
     setTimeout(function(){socket.emit("board",board)},1000)
     //socket.emit("board",board)
+    console.log(888)
 }
-socket.on("board",(b)=>{
-    //console.log(b)
-    board = b
-})
+
 
 function main() {
     currentPlayer = "X";
@@ -148,6 +178,8 @@ function getRowCol(event) {
         row = -1;
         col = -1;
     }
+    socket.emit("row",row)
+    socket.emit("col",col)
     return row, col;
 }
 
@@ -156,7 +188,7 @@ function markBoard(row, col) {
     if (row >= 0 && col >= 0) {
         if (board[row][col] === "") {
             board[row][col] = currentPlayer;
-            drawMark(row, col);
+            //drawMark(row, col);
             marked = true;
         } else {
             //console.log("Spot is being used");

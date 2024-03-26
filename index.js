@@ -17,6 +17,12 @@ function tic(io){
         socket.on('board',(board) => {
           io.emit('board',board)
         })
+        socket.on('row',(row) => {
+          io.emit('row',row)
+        })
+        socket.on('col',(col) => {
+          io.emit('col',col)
+        })
 
         io.emit("turn",serverTurn)
         socket.on('buttonpress', () => {
