@@ -17,6 +17,9 @@ function tic(io){
         socket.on('board',(board) => {
           io.emit('board',board)
         })
+        socket.on('currentPlayer',(currentPlayer) => {
+          io.emit('currentPlayer',currentPlayer)
+        })
         socket.on('row',(row) => {
           io.emit('row',row)
         })

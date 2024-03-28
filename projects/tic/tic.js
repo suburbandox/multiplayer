@@ -28,18 +28,43 @@ socket.once('playernum', (playernum) => {
 let row2,col2
 
 socket.on("row",(r)=>{
-    console.log(r)
+    //console.log(r)
     row2 =r
 })
 socket.on("col",(c)=>{
-    console.log(c)
+    //console.log(c)
     col2 = c
 })
 socket.on("board",(b)=>{
     console.log(b)
     board = b
-    drawotherboard()
+    //drawotherboard()
+    mapping()
 })
+socket.on("currentPlayer",(p)=>{
+    currentPlayer=p
+    console.log(currentPlayer)
+})
+function mapping(){
+  //const mappedArray = twoDArray.map(row => row.map(element => element * 2));
+  //debugger;
+  for (var x = 0; x < board.length; x++) {
+    for (var y = 0; y < board[x].length; y++) {
+      //board[x][y] = "";
+      //if (board[x][y] != "") {
+        //console.log(555)
+        //console.log(y)
+        //drawMark(x,y);
+        //drawMark(1, 1);
+        if(board[x][y] ==="X"){
+            drawboard(x,y,"X")
+        }else if(board[x][y] ==="O"){
+            drawboard(x,y,"O")
+        }
+      //}
+    }
+  }
+}
 var currentPlayer; // string
 var keepPlaying; // bool
 var row, col; // int
@@ -80,12 +105,11 @@ function clearboard(){
 
 }
 function drawotherboard(){
-    console.log(row2)
-    console.log(col2)
+    //console.log(row2)
+    //console.log(col2)
     //setTimeout(()=>{markBoard(row2,col2)},1000)
     drawMark(row2,col2)
 }
-
 
 playAgainBtn.addEventListener("click",function(){
     keepPlaying =true;
@@ -95,7 +119,6 @@ playAgainBtn.addEventListener("click",function(){
         for (var y = 0; y < board[x].length; y++) {
             board[x][y] = "";
         }
-    
     }
     xs_and_os.innerHTML ="";
     winner =false;
@@ -106,9 +129,8 @@ ticTacToeContainer.addEventListener("click",click)
 function click(){
     setTimeout(function(){socket.emit("board",board)},1000)
     //socket.emit("board",board)
-    console.log(888)
+    //console.log(888)
 }
-
 
 function main() {
     currentPlayer = "X";
@@ -130,6 +152,8 @@ function switchPlayer() {
         currentPlayer = "X";
         playerIdstatment.innerHTML = currentPlayer;
     }
+    socket.emit("currentPlayer",currentPlayer)
+    console.log(1800)
 }
 
 function getRowCol(event) {
@@ -197,6 +221,30 @@ function markBoard(row, col) {
     return marked;
 }
 
+function drawboard(row, col, let) {
+    if (let === "X") {
+        const line1 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        const line2 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line1.setAttribute("x1", 15 + (col * 75));
+        line1.setAttribute("y1", 15 + (row * 75));
+        line1.setAttribute("x2", 60 + (col * 75));
+        line1.setAttribute("y2", 60 + (row * 75));
+        line2.setAttribute("x1", 15 + (col * 75));
+        line2.setAttribute("y1", 60 + (row * 75));
+        line2.setAttribute("x2", 60 + (col * 75));
+        line2.setAttribute("y2", 15 + (row * 75));
+        xs_and_os.appendChild(line1);
+        xs_and_os.appendChild(line2);
+    } else if(let ==="O") {
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", 37 + (col * 75));
+        circle.setAttribute("cy", 37 + (row * 75));
+        circle.setAttribute("r", 25);
+        xs_and_os.appendChild(circle);
+    }
+}
+
+
 function drawMark(row, col) {
     if (currentPlayer === "X") {
         const line1 = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -211,7 +259,7 @@ function drawMark(row, col) {
         line2.setAttribute("y2", 15 + (row * 75));
         xs_and_os.appendChild(line1);
         xs_and_os.appendChild(line2);
-    } else {
+    } else if(currentPlayer ==="O") {
         const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         circle.setAttribute("cx", 37 + (col * 75));
         circle.setAttribute("cy", 37 + (row * 75));
