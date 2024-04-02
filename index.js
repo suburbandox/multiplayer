@@ -39,6 +39,17 @@ function tic(io){
         });
       })
 }
+async function movie(io ,db){
+  await db.exec(`
+  CREATE TABLE IF NOT EXISTS movie (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT,
+    year INTEGER,
+    genre TEXT
+  );
+`);
+}
+
 async function chat(io) {
   const db = await open({
     filename: 'chat.db',
@@ -90,10 +101,20 @@ async function main() {
   const server = createServer(app);
   const io = new Server(server)
 
+  const db = await open({
+    filename: 'app.db',
+    driver: sqlite3.Database
+  });
+
   await chat(io);
   tic(io)
+  await movie(io,db)
 
+  app.use(express.json())
   app.use(express.static('projects'));
+
+  app.use(express.urlencoded({extended:true}))
+
   app.get('/', (req, res) => {
     res.sendFile(join(__dirname, 'projects/home/index.html'));
   });
@@ -104,6 +125,15 @@ async function main() {
 
   app.get('/chat', (req, res) => {
     res.sendFile(join(__dirname, 'projects/chat/chat.html'));
+  });
+
+  app.get('/movie', (req, res) => {
+    res.sendFile(join(__dirname, 'projects/movie/movie.html'));
+  });
+  app.post('/movie/create', (req, res) => {
+
+    console.log(req.body)
+    res.sendFile(join(__dirname, 'projects/movie/movie.html'));
   });
 
   const port = 3000;
