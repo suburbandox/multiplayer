@@ -4,6 +4,7 @@ const { join } = require('node:path');
 const { Server } = require('socket.io');
 const sqlite3 = require('sqlite3');
 const { open } = require('sqlite');
+const cons = require('@ladjs/consolidate');
 
 function tic(io){
     let serverTurn =0
@@ -48,6 +49,7 @@ async function movie(io ,db){
     genre TEXT
   );
 `);
+
 }
 
 async function chat(io) {
@@ -110,6 +112,10 @@ async function main() {
   tic(io)
   await movie(io,db)
 
+  app.engine('html', cons.mustache);
+  app.set('views', './views')
+  app.set('view engine', 'html')
+
   //app.use(express.json())
   app.use(express.static('projects'));
 
@@ -130,10 +136,25 @@ async function main() {
   app.get('/movie', (req, res) => {
     res.sendFile(join(__dirname, 'projects/movie/movie.html'));
   });
-  app.post('/movie/create', (req, res) => {
 
+  app.get('/movies', async (req, res) => {
+    const movies = await db.all('select * from movie')
+    res.render('movies', { movies })
+  });
+
+  app.post('/movie/create', async (req, res) => {
     console.log(req.body)
-    res.sendFile(join(__dirname, 'projects/movie/movie.html'));
+    const { title, year, genre } = req.body
+
+    const result = await db.run(`
+      INSERT INTO movie (title, year, genre)
+      VALUES (?, ?, ?)`,
+      title, year, genre
+    );
+    
+    console.log(`result is ${result}`)
+
+    res.sendFile(join(__dirname, 'projects/movie/list.html'));
   });
 
   const port = 3000;
