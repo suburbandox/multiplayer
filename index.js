@@ -110,7 +110,7 @@ async function main() {
   tic(io)
   await movie(io,db)
 
-  app.use(express.json())
+  //app.use(express.json())
   app.use(express.static('projects'));
 
   app.use(express.urlencoded({extended:true}))

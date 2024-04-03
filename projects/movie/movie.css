@@ -1,0 +1,15 @@
+body{
+    background-color: blanchedalmond;
+}
+form{
+
+    border: 2px black solid;
+    width: 500px;
+
+    margin: auto;
+    padding: 20px;
+    margin-top: 50px;
+}
+input{
+    display: block;
+}
