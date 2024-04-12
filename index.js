@@ -2,7 +2,7 @@ const express = require('express');
 const { createServer } = require('node:http');
 const { join } = require('node:path');
 const { Server } = require('socket.io');
-const sqlite3 = require('sqlite3');
+const sqlite3 = require('sqlite3');//.verbose(); wats this
 const { open } = require('sqlite');
 const cons = require('@ladjs/consolidate');
 
@@ -103,6 +103,8 @@ async function main() {
   const server = createServer(app);
   const io = new Server(server)
 
+  // const db = new sqlite3.Database('example.db');
+
   const db = await open({
     filename: 'app.db',
     driver: sqlite3.Database
@@ -141,6 +143,10 @@ async function main() {
     const movies = await db.all('select * from movie')
     res.render('movies', { movies })
   });
+  app.get('/movie_update', async (req, res) => {
+    res.sendFile(join(__dirname, 'projects/movie/update.html'));
+  });
+
 
   app.post('/movie/create', async (req, res) => {
     console.log(req.body)
@@ -149,13 +155,49 @@ async function main() {
     const result = await db.run(`
       INSERT INTO movie (title, year, genre)
       VALUES (?, ?, ?)`,
-      title, year, genre
+      title, year, genre// why is this not a array
     );
     
     console.log(`result is ${result}`)
 
-    res.sendFile(join(__dirname, 'projects/movie/list.html'));
+    //res.sendFile(join(__dirname, 'projects/movie/list.html'));
+    //res.redirect('/movies')
   });
+
+  app.post("/movie/update", (req, res) => {
+    //why is this async chat gpt has no async
+    console.log(req.body);
+    const { val, id, param } = req.body;
+    console.log(param);
+
+    const updateQuery = `
+    UPDATE movie
+    SET ${param}= ? 
+    WHERE id = ?;
+  `;// why did ${param} work this '?' dident
+
+    // Execute the update query
+    db.run(updateQuery, [ val, id], function (err) {
+      if (err) {
+        console.error("Error updating record:", err.message);
+        res.status(500).send("Internal Server Error");
+        return;
+      }
+      console.log(`Row(s) updated: ${this.changes}`);
+      res.send("Record updated successfully");
+    });
+    // const result = await db.run(`
+    //   INSERT INTO movie (title, year, genre)
+    //   VALUES (?, ?, ?)`,
+    //   title, year, genre
+    // );
+
+    // console.log(`result is ${result}`)
+
+    // //res.sendFile(join(__dirname, 'projects/movie/list.html'));
+    res.redirect('/movies')
+  });
+
 
   const port = 3000;
   server.listen(port, () => {
