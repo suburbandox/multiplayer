@@ -161,7 +161,7 @@ async function main() {
     console.log(`result is ${result}`)
 
     //res.sendFile(join(__dirname, 'projects/movie/list.html'));
-    //res.redirect('/movies')
+    res.redirect('/movies')
   });
 
   app.post("/movie/update", (req, res) => {
