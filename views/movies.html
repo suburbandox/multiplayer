@@ -19,14 +19,17 @@
     </head>
 
 <h1>Hello</h1>
-<table>
+<table id="myTable">
+  <thead>
     <tr>
         <th>id</th>
         <th>title</th>
         <th>year</th>
         <th>genre</th>
     </tr>
-    {{#movies}}
+  </thead>
+    <tbody>
+          {{#movies}}
     <tr>
       <td>{{id}}</td>
         <td>{{title}}</td>
@@ -36,4 +39,76 @@
   <!-- <div>{{title}}</div> -->
 
 {{/movies}}
+    </tbody>
+
 </table>
+<script>
+  // Get the table element
+  var table = document.getElementById('myTable');
+
+  // Attach double-click event listener to the table
+  table.addEventListener('dblclick', function (event) {
+    // Check if the double-clicked element is a table row
+    if (event.target.tagName.toLowerCase() === 'td') {
+      // Get the parent row of the clicked cell
+      var row = event.target.parentElement;
+
+      // Get the index of the row
+      var rowIndex = row.rowIndex;
+      // Convert the row to an object
+      //var rowData = {};
+      //var cells = row.querySelectorAll('td');
+      //   for (var i = 0; i < cells.length; i++) {
+      //     var cell = cells[i];
+      //     var columnName = cell.parentElement.querySelector('th:nth-child(' + (i + 1) + ')').textContent;
+      //     rowData[columnName] = cell.textContent;
+      //   }
+      // const myArr = ["Orange", "Banana", "Mango", "Kiwi"];
+      // Log the row data object
+      // console.log('Double-clicked row:', rowData);
+      // console.log('Double-clicked row:', cells);
+      // console.log(typeof cells);
+      // console.log(Array.isArray(cells));
+      // console.log(Array.isArray(rowData));
+      // console.log(typeof row);
+      // console.log(Array.isArray(myArr));
+      // Get the second row (index 1)
+      // var row = t.rows[1];
+
+      // Print the HTML content of the row
+      // console.log(row.innerHTML);
+      // console.log(typeof row.innerHTML);
+
+
+      // Display the index of the double-clicked row
+      console.log('Double-clicked on row ' + rowIndex);
+      //console.log(row.parentElement);
+      function convertRowToObject(index) {
+        // Get the table element
+        var table = document.getElementById("myTable");
+        // Get the rows in the table body
+        var rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+        // Get the table headers
+        var headers = table.getElementsByTagName("thead")[0].getElementsByTagName("th");
+
+        // Check if the index is valid
+        if (index >= 0 && index < rows.length) {
+          // Get the row at the specified index
+          var row = rows[index];
+          console.log(row.innerHTML);
+          var rowData = {};
+          // Iterate through each cell in the row
+          for (var i = 0; i < headers.length; i++) {
+            // Use the header text as the key and cell text as the value
+            rowData[headers[i].innerText] = row.cells[i].innerText;
+          }
+          // Log the resulting object
+          console.log(rowData);
+        } else {
+          console.error("Invalid index");
+        }
+      }
+    }
+    convertRowToObject(rowIndex - 1)
+  });
+</script>
