@@ -1,0 +1,29 @@
+<head>
+    <style>
+        body{
+    background-color: blanchedalmond;
+}
+form{
+
+    border: 2px black solid;
+    width: 500px;
+
+    margin: auto;
+    padding: 20px;
+    margin-top: 50px;
+}
+input{
+    display: block;
+}
+    </style>
+</head>
+<form action="/movies_update" method="post">
+    <label for="title">id</label>
+    <input type="text" id="title" name="title" value="die hard">
+    <label for="year">year</label>
+    <input type="text" id="year" name="year" value="1998">
+    <label for="genre">genre</label>
+    <input type="text" id="genre" name="genre" value="action">
+
+    <input type="submit" value="submit">
+</form>

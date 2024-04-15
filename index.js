@@ -146,6 +146,10 @@ async function main() {
   app.get('/movie_update', async (req, res) => {
     res.sendFile(join(__dirname, 'projects/movie/update.html'));
   });
+  app.get('/movies_update', async (req, res) => {
+    //res.sendFile(join(__dirname, 'projects/movie/update.html'));
+    res.render('moviesupdate')
+  });
 
 
   app.post('/movie/create', async (req, res) => {
@@ -165,6 +169,40 @@ async function main() {
   });
 
   app.post("/movie/update", (req, res) => {
+    //why is this async chat gpt has no async
+    console.log(req.body);
+    const { val, id, param } = req.body;
+    console.log(param);
+
+    const updateQuery = `
+    UPDATE movie
+    SET ${param}= ? 
+    WHERE id = ?;
+  `;// why did ${param} work this '?' dident
+
+    // Execute the update query
+    db.run(updateQuery, [ val, id], function (err) {
+      if (err) {
+        console.error("Error updating record:", err.message);
+        res.status(500).send("Internal Server Error");
+        return;
+      }
+      console.log(`Row(s) updated: ${this.changes}`);
+      res.send("Record updated successfully");
+    });
+    // const result = await db.run(`
+    //   INSERT INTO movie (title, year, genre)
+    //   VALUES (?, ?, ?)`,
+    //   title, year, genre
+    // );
+
+    // console.log(`result is ${result}`)
+
+    // //res.sendFile(join(__dirname, 'projects/movie/list.html'));
+    res.redirect('/movies')
+  });
+
+  app.post("/movies/update", (req, res) => {
     //why is this async chat gpt has no async
     console.log(req.body);
     const { val, id, param } = req.body;
