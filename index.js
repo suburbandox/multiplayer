@@ -118,8 +118,8 @@ async function main() {
   app.set('views', './views')
   app.set('view engine', 'html')
 
-  //app.use(express.json())
-  app.use(express.static('projects'));
+  app.use(express.json())
+  app.use(express.static('public'));
 
   app.use(express.urlencoded({extended:true}))
 
@@ -138,6 +138,10 @@ async function main() {
   app.get('/movie', (req, res) => {
     res.sendFile(join(__dirname, 'projects/movie/movie.html'));
   });
+  app.get('/movies/:id', (req, res) => {
+    console.log(req.params)
+    res.sendFile(join(__dirname, 'projects/movie/movie.html'));
+  });
 
   app.get('/movies', async (req, res) => {
     const movies = await db.all('select * from movie')
@@ -150,6 +154,7 @@ async function main() {
     //res.sendFile(join(__dirname, 'projects/movie/update.html'));
     res.render('moviesupdate')
   });
+
 
 
   app.post('/movie/create', async (req, res) => {
@@ -205,17 +210,19 @@ async function main() {
   app.post("/movies/update", (req, res) => {
     //why is this async chat gpt has no async
     console.log(req.body);
-    const { val, id, param } = req.body;
-    console.log(param);
+    const { genre, id, title,year } = req.body;
+    //console.log(param);
 
     const updateQuery = `
     UPDATE movie
-    SET ${param}= ? 
+    SET genre =?,
+    year = ?,
+    title=?
     WHERE id = ?;
-  `;// why did ${param} work this '?' dident
+  `;
 
     // Execute the update query
-    db.run(updateQuery, [ val, id], function (err) {
+    db.run(updateQuery, [ genre,year,title, id], function (err) {
       if (err) {
         console.error("Error updating record:", err.message);
         res.status(500).send("Internal Server Error");
@@ -224,16 +231,7 @@ async function main() {
       console.log(`Row(s) updated: ${this.changes}`);
       res.send("Record updated successfully");
     });
-    // const result = await db.run(`
-    //   INSERT INTO movie (title, year, genre)
-    //   VALUES (?, ?, ?)`,
-    //   title, year, genre
-    // );
-
-    // console.log(`result is ${result}`)
-
-    // //res.sendFile(join(__dirname, 'projects/movie/list.html'));
-    res.redirect('/movies')
+    res.send("here")
   });
 
 

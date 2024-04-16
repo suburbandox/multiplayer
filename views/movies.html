@@ -47,7 +47,7 @@
   var table = document.getElementById('myTable');
 
   // Attach double-click event listener to the table
-  table.addEventListener('dblclick', function (event) {
+  table.addEventListener('click', function (event) {
     // Check if the double-clicked element is a table row
     if (event.target.tagName.toLowerCase() === 'td') {
       // Get the parent row of the clicked cell
@@ -104,6 +104,13 @@
           }
           // Log the resulting object
           console.log(rowData);
+          //need to post rowData to /movies/update
+          const response = fetch("/movies/update", {
+            method: "POST", body: JSON.stringify(rowData), headers: {
+              "Content-Type": "application/json",
+            },
+          })
+          //document.location.href="/movies_update"
         } else {
           console.error("Invalid index");
         }
