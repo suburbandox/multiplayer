@@ -151,14 +151,12 @@ async function main() {
     res.sendFile(join(__dirname, 'projects/movie/update.html'));
   });
   app.get('/movies_update', async (req, res) => {
-    //res.sendFile(join(__dirname, 'projects/movie/update.html'));
     res.render('moviesupdate')
   });
 
-
-
   app.post('/movie/create', async (req, res) => {
     console.log(req.body)
+    console.log("blue")
     const { title, year, genre } = req.body
 
     const result = await db.run(`
@@ -208,31 +206,50 @@ async function main() {
   });
 
   app.post("/movies/update", (req, res) => {
-    //why is this async chat gpt has no async
-    console.log(req.body);
-    const { genre, id, title,year } = req.body;
-    //console.log(param);
-
-    const updateQuery = `
-    UPDATE movie
-    SET genre =?,
-    year = ?,
-    title=?
-    WHERE id = ?;
-  `;
-
-    // Execute the update query
-    db.run(updateQuery, [ genre,year,title, id], function (err) {
-      if (err) {
-        console.error("Error updating record:", err.message);
-        res.status(500).send("Internal Server Error");
-        return;
-      }
-      console.log(`Row(s) updated: ${this.changes}`);
-      res.send("Record updated successfully");
-    });
-    res.send("here")
+    const movie = req.body;
+    console.log(movie)
+    //console.log("red")
+    res.render('moviesupdate',movie)
+    res.redirect('/chat')
+  
   });
+  app.get("/movies/update:id", (req, res) => {
+    //const movie = req.body;
+    console.log("redrum")
+    //console.log("red")
+    //res.render('moviesupdate',movie)
+    //res.redirect('/chat')
+  
+  });
+
+  // app.post("/movies/update", (req, res) => {
+  //   //why is this async chat gpt has no async
+  //   console.log(req.body);
+    
+  //   const { genre, id, title,year } = req.body;
+  //   //console.log(param);
+
+  //   const updateQuery = `
+  //   UPDATE movie
+  //   SET genre =?,
+  //   year = ?,
+  //   title=?
+  //   WHERE id = ?;
+  // `;
+
+  //   // Execute the update query
+  //   db.run(updateQuery, [ genre,year,title, id], function (err) {
+  //     if (err) {
+  //       console.error("Error updating record:", err.message);
+  //       res.status(500).send("Internal Server Error");
+  //       return;
+  //     }
+  //     console.log(`Row(s) updated: ${this.changes}`);
+  //     res.send("Record updated successfully");
+  //   });
+  //   res.send("here")
+  // });
+
 
 
   const port = 3000;

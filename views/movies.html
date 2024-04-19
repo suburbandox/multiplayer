@@ -1,45 +1,46 @@
 <head>
-    <style>
+  <style>
     table {
       font-family: arial, sans-serif;
       border-collapse: collapse;
       width: 100%;
     }
-    
-    td, th {
+
+    td,
+    th {
       border: 1px solid #dddddd;
       text-align: left;
       padding: 8px;
     }
-    
+
     tr:nth-child(even) {
       background-color: #dddddd;
     }
-    </style>
-    </head>
+  </style>
+</head>
 
 <h1>Hello</h1>
 <table id="myTable">
   <thead>
     <tr>
-        <th>id</th>
-        <th>title</th>
-        <th>year</th>
-        <th>genre</th>
+      <th>id</th>
+      <th>title</th>
+      <th>year</th>
+      <th>genre</th>
     </tr>
   </thead>
-    <tbody>
-          {{#movies}}
+  <tbody>
+    {{#movies}}
     <tr>
       <td>{{id}}</td>
-        <td>{{title}}</td>
-        <td>{{year}}</td>
-        <td>{{genre}}</td>
+      <td>{{title}}</td>
+      <td>{{year}}</td>
+      <td>{{genre}}</td>
     </tr>
-  <!-- <div>{{title}}</div> -->
+    <!-- <div>{{title}}</div> -->
 
-{{/movies}}
-    </tbody>
+    {{/movies}}
+  </tbody>
 
 </table>
 <script>
@@ -56,29 +57,6 @@
       // Get the index of the row
       var rowIndex = row.rowIndex;
       // Convert the row to an object
-      //var rowData = {};
-      //var cells = row.querySelectorAll('td');
-      //   for (var i = 0; i < cells.length; i++) {
-      //     var cell = cells[i];
-      //     var columnName = cell.parentElement.querySelector('th:nth-child(' + (i + 1) + ')').textContent;
-      //     rowData[columnName] = cell.textContent;
-      //   }
-      // const myArr = ["Orange", "Banana", "Mango", "Kiwi"];
-      // Log the row data object
-      // console.log('Double-clicked row:', rowData);
-      // console.log('Double-clicked row:', cells);
-      // console.log(typeof cells);
-      // console.log(Array.isArray(cells));
-      // console.log(Array.isArray(rowData));
-      // console.log(typeof row);
-      // console.log(Array.isArray(myArr));
-      // Get the second row (index 1)
-      // var row = t.rows[1];
-
-      // Print the HTML content of the row
-      // console.log(row.innerHTML);
-      // console.log(typeof row.innerHTML);
-
 
       // Display the index of the double-clicked row
       console.log('Double-clicked on row ' + rowIndex);
@@ -104,12 +82,38 @@
           }
           // Log the resulting object
           console.log(rowData);
+          let ids = rowData.id
+          console.log(ids)
           //need to post rowData to /movies/update
-          const response = fetch("/movies/update", {
-            method: "POST", body: JSON.stringify(rowData), headers: {
-              "Content-Type": "application/json",
-            },
-          })
+
+          const id = 123; // Example ID
+const year = 2024; // Example year
+
+// Construct the URL with query parameters
+const url = `/movies/update?id=${id}&year=${year}`;
+console.log("URL:", url); // Check the constructed URL
+
+fetch(url, {
+    method: "GET",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    redirect: "follow"
+})
+.then(response => {
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return response.json();
+})
+.then(data => {
+    console.log(data);
+})
+.catch(error => {
+    console.error('There was a problem with your fetch operation:', error);
+});
+
+
           //document.location.href="/movies_update"
         } else {
           console.error("Invalid index");
