@@ -210,17 +210,44 @@ async function main() {
     console.log(movie)
     //console.log("red")
     res.render('moviesupdate',movie)
-    res.redirect('/chat')
-  
-  });
-  app.get("/movies/update:id", (req, res) => {
-    //const movie = req.body;
-    console.log("redrum")
-    //console.log("red")
-    //res.render('moviesupdate',movie)
+    //console.log("redrum")
     //res.redirect('/chat')
+    //const renderedView = renderView(movie);
+
+    // Send the rendered view as the response
+    //res.send(renderedView);
   
   });
+  app.get('/movies/update', (req, res) => {
+    
+    const id = req.query.id; // Extract id parameter from query string
+    const year = req.query.year; // Extract year parameter from query string
+    
+    // Process the id and year parameters as needed
+    // console.log("ID:", "id");
+    //  console.log("Year:", "year");
+    // console.log(99)
+    // console.log(req.params)
+    // Send a response (optional)
+    res.send('Received GET request with id=' + id + ' and year=' + year);
+    res.render('moviesupdate')
+});
+app.get('/movies/redrum', (req, res) => {
+    
+  const id = req.query.id; // Extract id parameter from query string
+  const year = req.query.year; // Extract year parameter from query string
+  
+  // Process the id and year parameters as needed
+  // console.log("ID:", "id");
+  //  console.log("Year:", "year");
+  // console.log(99)
+  // console.log(req.params)
+  // Send a response (optional)
+  //res.send('Received GET request with id=' + id + ' and year=' + year);
+  res.send('that dumb dog' );
+
+  res.render('moviesupdate')
+});
 
   // app.post("/movies/update", (req, res) => {
   //   //why is this async chat gpt has no async

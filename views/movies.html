@@ -86,37 +86,44 @@
           console.log(ids)
           //need to post rowData to /movies/update
 
-          const id = 123; // Example ID
-const year = 2024; // Example year
+          const id = rowData.id; // Example ID
+          const year = rowData.year; // Example year
 
-// Construct the URL with query parameters
-const url = `/movies/update?id=${id}&year=${year}`;
-console.log("URL:", url); // Check the constructed URL
+          // Construct the URL with query parameters
+          const url = `/movies/update?id=${id}&year=${year}`;
+          const url2 = `/movies/redrum?id=${id}&year=${year}`;
+          //const url = `/movies/update`
 
-fetch(url, {
-    method: "GET",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    redirect: "follow"
-})
-.then(response => {
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return response.json();
-})
-.then(data => {
-    console.log(data);
-})
-.catch(error => {
-    console.error('There was a problem with your fetch operation:', error);
-});
+
+          console.log("URL:", url); // Check the constructed URL
+
+          const response = fetch('/movies/update', {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(rowData)
+          })
+          
+          const response2 = fetch(url, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json"
+            }
+          })
+          const response3 = fetch(url2, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json"
+            }
+          })
+
 
 
           //document.location.href="/movies_update"
-        } else {
-          console.error("Invalid index");
+          //window.location.href="/movies_update"
+          // } else {
+          //   console.error("Invalid index");
         }
       }
     }
