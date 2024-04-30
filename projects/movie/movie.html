@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic-Tac-Toe</title>
+    <title>Movie Create</title>
     
     <link rel="stylesheet" href="/movie.css">
 </head>
@@ -12,75 +12,11 @@
     <label for="title">title</label>
         <input type="text" id="title"  name="title">
         <label for="year">year</label>
-        <!-- <input type="number" name="year3" id="year"> -->
         <input type="text" id="year" name="year" pattern="[0-9]{4}" maxlength="4" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
         <label for="genre">genre</label>
         <input type="text" name="genre" id="genre">
-        <!-- <input type="date" name="begin"
-        placeholder="dd-mm-yyyy" value=""
-        min="1997-01-01" max="2030-12-31">   -->
-        <!-- <input type="number" id="year" name="year5" min="1900" max="2100" step="1"> -->
-        <!-- <input type="text" id="yea2r" name="year"  maxlength="4">
-        <input type="text" id="year" name="year" pattern="[0-9]{4}" maxlength="4"> -->
-        <!-- <input type="color"> -->
-        
-  <!-- <input type="reset" value="Reset"> -->
-
-
-
-
         <input type="submit" value="submit">
-
-
    </form>
-   <!-- <form>
-    <fieldset>
-    <legend>Employee Details</legend>
-     <p>
-         First name: <input type = "text" name = "fname" />
-  </p>
-   <p>
-         Last name: <input type = "text" name = "lname" />
-  </p>
- 
-   <p>
-         <input type = "radio" name = "Gender" value = "Male"> Male
-         <input type = "radio" name = "Gender" value = "Female"> Female
-</p>
- 
-<p>
-Employee ID: <input type = "text" name = "ID" />
-</p>
- 
-<p>
-Designation: <input type = "text" name = "ID" />
-</p>
- 
-<p>
-Phone Number: <input type = "text" name = "phone" />
-</p>
- 
- <p>
-      <input type = "submit" name = "submit" value = "Submit" />
-    </p>
-</fieldset>
-</form>
-<form action="/action_page.php">
-    <fieldset>
-     <legend>Personalia:</legend>
-     <label for="fname">First name:</label>
-     <input type="text" id="fname" name="fname"><br><br>
-     <label for="lname">Last name:</label>
-     <input type="text" id="lname" name="lname"><br><br>
-     <label for="email">Email:</label>
-     <input type="email" id="email" name="email"><br><br>
-     <label for="birthday">Birthday:</label>
-     <input type="date" id="birthday" name="birthday"><br><br>
-     <input type="submit" value="Submit">
-    </fieldset>
-   </form> -->
     <script src="/socket.io/socket.io.js"></script>
-
-
 </body>
 </html>

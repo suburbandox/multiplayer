@@ -135,11 +135,7 @@ async function main() {
     res.sendFile(join(__dirname, 'projects/chat/chat.html'));
   });
 
-  app.get('/movie', (req, res) => {
-    res.sendFile(join(__dirname, 'projects/movie/movie.html'));
-  });
-  app.get('/movies/:id', (req, res) => {
-    console.log(req.params)
+  app.get('/create_movie', (req, res) => {
     res.sendFile(join(__dirname, 'projects/movie/movie.html'));
   });
 
@@ -150,18 +146,14 @@ async function main() {
   app.get('/movie_update', async (req, res) => {
     res.sendFile(join(__dirname, 'projects/movie/update.html'));
   });
-  app.get('/movies_update', async (req, res) => {
-    
+
+  app.get('/movies/:id', async (req, res) => {
     const result = await db.get(`
-      SELECT title, year, genre
+      SELECT title, year, genre,id
       FROM movie
       where id = ?
-      `, req.query.id
+      `, req.params.id
     );
-
-    console.log(result)
-
-    console.log('movies_update with query ' + JSON.stringify(req.query))
     res.render('moviesupdate', { movie: result })
   });
 
@@ -177,25 +169,21 @@ async function main() {
     );
     
     console.log(`result is ${result}`)
-
-    //res.sendFile(join(__dirname, 'projects/movie/list.html'));
     res.redirect('/movies')
   });
 
-  app.post("/movie/update", (req, res) => {
-    //why is this async chat gpt has no async
-    console.log(req.body);
-    const { val, id, param } = req.body;
-    console.log(param);
-
+  app.post("/movies_update", (req, res) => {
+    const movie = req.body;
+    console.log(movie)
+    const { id, title, year, genre } = req.body;
     const updateQuery = `
     UPDATE movie
-    SET ${param}= ? 
-    WHERE id = ?;
-  `;// why did ${param} work this '?' dident
+    SET  title= ?,
+    year = ?,
+    genre = ?
+    WHERE id = ?`;
 
-    // Execute the update query
-    db.run(updateQuery, [ val, id], function (err) {
+    db.run(updateQuery, [title, year, genre,id], function (err) {
       if (err) {
         console.error("Error updating record:", err.message);
         res.status(500).send("Internal Server Error");
@@ -204,93 +192,10 @@ async function main() {
       console.log(`Row(s) updated: ${this.changes}`);
       res.send("Record updated successfully");
     });
-    // const result = await db.run(`
-    //   INSERT INTO movie (title, year, genre)
-    //   VALUES (?, ?, ?)`,
-    //   title, year, genre
-    // );
 
-    // console.log(`result is ${result}`)
-
-    // //res.sendFile(join(__dirname, 'projects/movie/list.html'));
-    res.redirect('/movies')
-  });
-
-  app.post("/movies/update", (req, res) => {
-    const movie = req.body;
-    console.log(movie)
-    //console.log("red")
-    res.render('moviesupdate',movie)
-    //console.log("redrum")
-    //res.redirect('/chat')
-    //const renderedView = renderView(movie);
-
-    // Send the rendered view as the response
-    //res.send(renderedView);
+    res.redirect("/movies");
   
   });
-  app.get('/movies/update', (req, res) => {
-    
-    const id = req.query.id; // Extract id parameter from query string
-    const year = req.query.year; // Extract year parameter from query string
-    
-    // Process the id and year parameters as needed
-    // console.log("ID:", "id");
-    //  console.log("Year:", "year");
-     console.log(99)
-    // console.log(req.params)
-    // Send a response (optional)
-    
-    res.send('Received GET request with id=' + id + ' and year=' + year);
-    res.render('moviesupdate')
-});
-app.get('/movies/redrum', (req, res) => {
-    
-  const id = req.query.id; // Extract id parameter from query string
-  const year = req.query.year; // Extract year parameter from query string
-  
-  // Process the id and year parameters as needed
-  // console.log("ID:", "id");
-  //  console.log("Year:", "year");
-  // console.log(99)
-  // console.log(req.params)
-  // Send a response (optional)
-  //res.send('Received GET request with id=' + id + ' and year=' + year);
-  res.send('that dumb dog' );
-
-  res.render('moviesupdate')
-});
-
-  // app.post("/movies/update", (req, res) => {
-  //   //why is this async chat gpt has no async
-  //   console.log(req.body);
-    
-  //   const { genre, id, title,year } = req.body;
-  //   //console.log(param);
-
-  //   const updateQuery = `
-  //   UPDATE movie
-  //   SET genre =?,
-  //   year = ?,
-  //   title=?
-  //   WHERE id = ?;
-  // `;
-
-  //   // Execute the update query
-  //   db.run(updateQuery, [ genre,year,title, id], function (err) {
-  //     if (err) {
-  //       console.error("Error updating record:", err.message);
-  //       res.status(500).send("Internal Server Error");
-  //       return;
-  //     }
-  //     console.log(`Row(s) updated: ${this.changes}`);
-  //     res.send("Record updated successfully");
-  //   });
-  //   res.send("here")
-  // });
-
-
-
   const port = 3000;
   server.listen(port, () => {
     console.log(`server running at http://localhost:${port}`);

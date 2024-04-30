@@ -17,9 +17,8 @@ input{
 }
     </style>
 </head>
-
-<h1>redrum</h1>
 <form action="/movies_update" method="post">
+    <input type="hidden" id="id" name="id" value="{{movie.id}}">
     <label for="title">title</label>
     <input type="text" id="title" name="title" value="{{movie.title}}">
     <label for="year">year</label>
@@ -29,3 +28,4 @@ input{
 
     <input type="submit" value="submit">
 </form>
+<script>console.log()</script>

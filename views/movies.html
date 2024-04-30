@@ -37,8 +37,6 @@
       <td>{{year}}</td>
       <td>{{genre}}</td>
     </tr>
-    <!-- <div>{{title}}</div> -->
-
     {{/movies}}
   </tbody>
 
@@ -65,73 +63,17 @@
         }
         // Log the resulting object
         console.log(rowData);
-        let ids = rowData.id
-        console.log(ids)
-        //need to post rowData to /movies/update
-
-        const id = rowData.id; // Example ID
-        const year = rowData.year; // Example year
-
-        // Construct the URL with query parameters
-        const url = `/movies/update?id=${id}&year=${year}`;
-        const url2 = `/movies/redrum?id=${id}&year=${year}`;
-        //const url = `/movies/update`
-        console.log("test")
-
-        console.log("URL:", url); // Check the constructed URL
-
-        // const response = await fetch('/movies/update', {
-        //   method: "POST",
-        //   headers: {
-        //     "Content-Type": "application/json"
-        //   },
-        //   body: JSON.stringify(rowData)
-        // })
-
-        // const text = await response.text()
-
-        // //debugger
-
-        // const response2 = fetch(url, {
-        //   method: "GET",
-        //   headers: {
-        //     "Content-Type": "application/json"
-        //   }
-        // })
-        // const response3 = fetch(url2, {
-        //   method: "GET",
-        //   headers: {
-        //     "Content-Type": "application/json"
-        //   }
-        // })
-
-
-
-    //document.location.href="/movies_update"
-    //window.location.href="/movies_update"
-    // } else {
-    //   console.error("Invalid index");
   }
 }
   // Get the table element
   var table = document.getElementById('myTable');
-
   // Attach double-click event listener to the table
   table.addEventListener('click', function (event) {
     // Check if the double-clicked element is a table row
     if (event.target.tagName.toLowerCase() === 'td') {
       // Get the parent row of the clicked cell
       var row = event.target.parentElement;
-
-      // Get the index of the row
-      var rowIndex = row.rowIndex;
-      // Convert the row to an object
-
-      // Display the index of the double-clicked row
-      console.log('Double-clicked on row ' + rowIndex);
-      //console.log(row.parentElement);
     }
-    document.location = `/movies_update?id=${row.dataset.id}`
-    // convertRowToObject(rowIndex - 1)
+    document.location = `/movies/${row.dataset.id}`
   });
 </script>
