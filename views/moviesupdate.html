@@ -17,17 +17,15 @@ input{
 }
     </style>
 </head>
-<h1>{{genre}}</h1>
-<h1>{{year}}</h1>
-<h1>{{title}}</h1>
+
 <h1>redrum</h1>
 <form action="/movies_update" method="post">
     <label for="title">title</label>
-    <input type="text" id="title" name="title" value="die hard">
+    <input type="text" id="title" name="title" value="{{movie.title}}">
     <label for="year">year</label>
-    <input type="text" id="year" name="year" value="1998">
+    <input type="text" id="year" name="year" value="{{movie.year}}">
     <label for="genre">genre</label>
-    <input type="text" id="genre" name="genre" value="action">
+    <input type="text" id="genre" name="genre" value="{{movie.genre}}">
 
     <input type="submit" value="submit">
 </form>

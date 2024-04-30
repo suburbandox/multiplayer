@@ -151,7 +151,18 @@ async function main() {
     res.sendFile(join(__dirname, 'projects/movie/update.html'));
   });
   app.get('/movies_update', async (req, res) => {
-    res.render('moviesupdate')
+    
+    const result = await db.get(`
+      SELECT title, year, genre
+      FROM movie
+      where id = ?
+      `, req.query.id
+    );
+
+    console.log(result)
+
+    console.log('movies_update with query ' + JSON.stringify(req.query))
+    res.render('moviesupdate', { movie: result })
   });
 
   app.post('/movie/create', async (req, res) => {
@@ -226,9 +237,10 @@ async function main() {
     // Process the id and year parameters as needed
     // console.log("ID:", "id");
     //  console.log("Year:", "year");
-    // console.log(99)
+     console.log(99)
     // console.log(req.params)
     // Send a response (optional)
+    
     res.send('Received GET request with id=' + id + ' and year=' + year);
     res.render('moviesupdate')
 });
