@@ -6,12 +6,7 @@ const sqlite3 = require('sqlite3');//.verbose(); wats this
 const { open } = require('sqlite');
 const cons = require('@ladjs/consolidate');
 const busboy = require('busboy');
-const os = require('os');
-const path = require('path');
 const fs = require('fs');
-
-
-
 
 function tic(io){
     let serverTurn =0
@@ -165,14 +160,21 @@ async function main() {
   });
 
   app.post('/upload', async (req, res) => {
-    console.log(req.body.image)
-    console.log(req.body.name)
-    console.log(req.body)
     const bb = busboy({ headers: req.headers });
     bb.on('file', (name, file, info) => {
       const { filename, encoding, mimeType } = info;
-      const saveTo = path.join(__dirname, `images`,filename);
-      file.pipe(fs.createWriteStream(saveTo));
+      const saveTo = join(__dirname, `images`,filename);
+      if(fs.existsSync(saveTo)){
+
+        res.end(`  <script>
+        alert("these are not the droids you are looking for")
+      </script>
+      <a href="/">go back</a>`)
+      return
+      }else{
+        const destination = fs.createWriteStream(saveTo);
+        file.pipe(destination);
+      }
       console.log(
         `File [${name}]: filename: %j, encoding: %j, mimeType: %j`,
         filename,
