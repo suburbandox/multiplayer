@@ -5,6 +5,13 @@ const { Server } = require('socket.io');
 const sqlite3 = require('sqlite3');//.verbose(); wats this
 const { open } = require('sqlite');
 const cons = require('@ladjs/consolidate');
+const busboy = require('busboy');
+const os = require('os');
+const path = require('path');
+const fs = require('fs');
+
+
+
 
 function tic(io){
     let serverTurn =0
@@ -123,7 +130,7 @@ async function main() {
 
   app.use(express.urlencoded({extended:true}))
 
-  app.get('/', (req, res) => {
+  app.get('/', (req, res) => {   
     res.sendFile(join(__dirname, 'projects/home/index.html'));
   });
 
@@ -155,6 +162,38 @@ async function main() {
       `, req.params.id
     );
     res.render('moviesupdate', { movie: result })
+  });
+
+  app.post('/upload', async (req, res) => {
+    console.log(req.body.image)
+    console.log(req.body.name)
+    console.log(req.body)
+    const bb = busboy({ headers: req.headers });
+    bb.on('file', (name, file, info) => {
+      const { filename, encoding, mimeType } = info;
+      const saveTo = path.join(__dirname, `images`,filename);
+      file.pipe(fs.createWriteStream(saveTo));
+      console.log(
+        `File [${name}]: filename: %j, encoding: %j, mimeType: %j`,
+        filename,
+        encoding,
+        mimeType
+      );
+      file.on('data', (data) => {
+        console.log(`File [${name}] got ${data.length} bytes`);
+      }).on('close', () => {
+        console.log(`File [${name}] done`);
+      });
+    });
+
+    req.pipe(bb);
+    bb.on('close', () => {
+      console.log('Done parsing form!');
+      res.sendFile(join(__dirname, 'projects/home/index.html'));
+      //res.writeHead(303, { Connection: 'close', Location: '/' });
+      //res.end();
+    });
+    
   });
 
   app.post('/movie/create', async (req, res) => {

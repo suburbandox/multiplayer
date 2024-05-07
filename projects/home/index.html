@@ -16,6 +16,10 @@
         <li><a href="/movies">View</a></li>
       </ul>
     </nav>
+    <form style="margin-top: 70px;" action="/upload" method="post" enctype="multipart/form-data">
+      <input type="file" name="image">
+      <button type="submit">Upload</button>
+  </form>
     <script src="/socket.io/socket.io.js"></script>
   </body>
 </html>
