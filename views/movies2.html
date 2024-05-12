@@ -1,0 +1,94 @@
+<head>
+    <style>
+      table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+  
+      td,
+      th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+  
+      tr:nth-child(even) {
+        background-color: #dddddd;
+      }
+      img{
+        width: 100px;
+      }
+    </style>
+    <script>
+     
+
+    </script>
+  </head>
+  
+  <h1>Hello</h1>
+  <table id="myTable">
+    <thead>
+      <tr>
+        <th>id</th>
+        <th>title</th>
+        <th>year</th>
+        <th>genre</th>
+        <th>image</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#movies}}
+      <tr data-id="{{id}}">
+        <td>{{id}}</td>
+        <td><a href="/movies_update?id={{id}}">{{title}}</a></td>
+        <td>{{year}}</td>
+        <td >{{genre}}</td>
+        <td><img id="image" src="{{image}}" alt="what image">  </td>
+      </tr>
+      {{/movies}}
+    </tbody>
+  
+  </table>
+
+  <script>
+      async function convertRowToObject(index) {
+        // Get the table element
+        var table = document.getElementById("myTable");
+        // Get the rows in the table body
+        var rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+        // Get the table headers
+        var headers = table.getElementsByTagName("thead")[0].getElementsByTagName("th");
+  
+        // Check if the index is valid
+        if (index >= 0 && index < rows.length) {
+          // Get the row at the specified index
+          var row = rows[index];
+          console.log(row.innerHTML);
+          var rowData = {};
+          // Iterate through each cell in the row
+          for (var i = 0; i < headers.length; i++) {
+            // Use the header text as the key and cell text as the value
+            rowData[headers[i].innerText] = row.cells[i].innerText;
+          }
+          // Log the resulting object
+          console.log(rowData);
+    }
+  }
+    // Get the table element
+    var table = document.getElementById('myTable');
+    // Attach double-click event listener to the table
+    table.addEventListener('click', function (event) {
+      // Check if the double-clicked element is a table row
+      if (event.target.tagName.toLowerCase() === 'td') {
+        // Get the parent row of the clicked cell
+        var row = event.target.parentElement;
+      }
+      document.location = `/movies/${row.dataset.id}`
+    });
+    // const imo = "Jupiter.jpg"
+    // const imo2 = "{{image}}"
+    // //document.getElementById('image').src = imo;
+    //   console.log(imo)
+    //   console.log(imo2)
+  </script>

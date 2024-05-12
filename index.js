@@ -122,6 +122,7 @@ async function main() {
 
   app.use(express.json())
   app.use(express.static('public'));
+  app.use(express.static('public/images'));
 
   app.use(express.urlencoded({extended:true}))
 
@@ -143,23 +144,26 @@ async function main() {
 
   app.get('/movies', async (req, res) => {
     const movies = await db.all('select * from movie')
-    res.render('movies', { movies })
-  });
-  app.get('/movie_update', async (req, res) => {
-    res.sendFile(join(__dirname, 'projects/movie/update.html'));
+    //res.render('movies', { movies })
+    res.render('movies2', { movies })
+
   });
 
   app.get('/movies/:id', async (req, res) => {
     const result = await db.get(`
-      SELECT title, year, genre,id
+      SELECT title, year, genre,id,image
       FROM movie
       where id = ?
       `, req.params.id
     );
-    res.render('moviesupdate', { movie: result })
+    //res.render('moviesupdate', { movie: result })
+    console.log(result)
+    res.render('moviesupdate2', { movie: result })
   });
 
   app.post('/upload', async (req, res) => {
+    let imo = "rainbow"
+    const formData = {}; // Initialize an empty object to store form data
     const bb = busboy({ headers: req.headers });
     bb.on('file', (name, file, info) => {
       const { filename, encoding, mimeType } = info;
@@ -186,6 +190,11 @@ async function main() {
       }).on('close', () => {
         console.log(`File [${name}] done`);
       });
+      imo=filename
+    });
+    bb.on('field', (name, val, info) => {
+      console.log(`Field [${name}]: value: %j`, val);
+      formData[name] = val;
     });
 
     req.pipe(bb);
@@ -194,8 +203,10 @@ async function main() {
       res.sendFile(join(__dirname, 'projects/home/index.html'));
       //res.writeHead(303, { Connection: 'close', Location: '/' });
       //res.end();
+      console.log(imo)
+      console.log('Form data:', formData);
+      console.log(formData.age)
     });
-    
   });
 
   app.post('/movie/create', async (req, res) => {
@@ -217,6 +228,7 @@ async function main() {
     const movie = req.body;
     console.log(movie)
     const { id, title, year, genre } = req.body;
+
     const updateQuery = `
     UPDATE movie
     SET  title= ?,
@@ -237,6 +249,82 @@ async function main() {
     res.redirect("/movies");
   
   });
+  app.post("/movies_update2", (req, res) => {
+    // const movie = req.body;
+    // console.log(movie)
+    // const { id, title, year, genre } = req.body;
+
+    let imo = "rainbow"
+    const formData = {}; // Initialize an empty object to store form data
+    const bb = busboy({ headers: req.headers });
+    bb.on('file', (name, file, info) => {
+      const { filename, encoding, mimeType } = info;
+      const saveTo = join(__dirname, `public/images`,filename);
+      // if(fs.existsSync(saveTo)){
+
+      //   res.end(`  <script>
+      //   alert("these are not the droids you are looking for")
+      // </script>
+      // <a href="/">go back</a>`)
+      // return
+      // }else{
+      //   const destination = fs.createWriteStream(saveTo);
+      //   file.pipe(destination);
+      // }
+      const destination = fs.createWriteStream(saveTo);
+      file.pipe(destination);
+      console.log(
+        `File [${name}]: filename: %j, encoding: %j, mimeType: %j`,
+        filename,
+        encoding,
+        mimeType
+      );
+      file.on('data', (data) => {
+        console.log(`File [${name}] got ${data.length} bytes`);
+      }).on('close', () => {
+        console.log(`File [${name}] done`);
+      });
+      imo=filename
+    });
+    bb.on('field', (name, val, info) => {
+      console.log(`Field [${name}]: value: %j`, val);
+      formData[name] = val;
+    });
+
+    req.pipe(bb);
+    bb.on('close', () => {
+      console.log('Done parsing form!');
+      res.sendFile(join(__dirname, 'projects/home/index.html'));
+      //res.writeHead(303, { Connection: 'close', Location: '/' });
+      //res.end();
+      console.log(imo)
+      console.log('Form data:', formData);
+      //console.log(formData.age)
+
+      const updateQuery = `
+    UPDATE movie
+    SET  title= ?,
+    year = ?,
+    genre = ?,
+    image=?
+    WHERE id = ?`;
+
+    db.run(updateQuery, [formData.title, formData.year, formData.genre,imo,formData.id], function (err) {
+      if (err) {
+        console.log("oops")
+        console.error("Error updating record:", err.message);
+        res.status(500).send("Internal Server Error");
+        return;
+      }
+      console.log(`Row(s) updated: ${this.changes}`);
+      res.send("Record updated successfully");
+    });
+
+    res.redirect("/movies");
+
+    });  
+  });
+  
   const port = 3000;
   server.listen(port, () => {
     console.log(`server running at http://localhost:${port}`);

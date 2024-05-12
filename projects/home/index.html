@@ -18,6 +18,9 @@
     </nav>
     <form style="margin-top: 70px;" action="/upload" method="post" enctype="multipart/form-data">
       <input type="file" name="image" accept="image/*">
+      <input type="text" name="name">
+      <input type="number" name="age">
+      <input type="datetime-local" name="date">
       <button type="submit">Upload</button>
   </form>
     <script src="/socket.io/socket.io.js"></script>

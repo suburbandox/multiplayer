@@ -1,0 +1,121 @@
+<head>
+    <style>
+        body{
+    background-color: blanchedalmond;
+}
+form{
+
+    border: 2px black solid;
+    width: 500px;
+
+    margin: auto;
+    padding: 20px;
+    margin-top: 50px;
+}
+input{
+    display: block;
+}
+    </style>
+</head>
+<form action="/movies_update2" method="post" enctype="multipart/form-data">
+    <input type="hidden" id="id" name="id" value="{{movie.id}}">
+    <label for="title">title</label>
+    <input type="text" id="title" name="title" value="{{movie.title}}">
+    <label for="year">year</label>
+    <input type="text" id="year" name="year" value="{{movie.year}}">
+    <label for="genre">genre</label>
+    <input type="text" id="genre" name="genre" value="{{movie.genre}}">
+    <input type="text" id="fileName" name="fileNameDisplay" value="{{movie.image}}">
+    <input type="file" name="image" accept="image/*" id="fileInput">
+
+    <input type="submit" value="submit">
+</form>
+
+<script>
+
+function updateFileInput() {
+  const fileInput = document.getElementById('fileInput');
+  const fileNameDisplay = document.getElementById('fileNameDisplay');
+  fileNameDisplay.textContent = fileInput.files[0] ? fileInput.files[0].name : 'No file selected';
+}
+
+    const input = document.querySelector("input");
+const preview = document.querySelector(".preview");
+
+input.style.opacity = 0;
+
+input.addEventListener("change", updateImageDisplay);
+
+function updateImageDisplay() {
+  while (preview.firstChild) {
+    preview.removeChild(preview.firstChild);
+  }
+
+  const curFiles = input.files;
+  if (curFiles.length === 0) {
+    const para = document.createElement("p");
+    para.textContent = "No files currently selected for upload";
+    preview.appendChild(para);
+  } else {
+    const list = document.createElement("ol");
+    preview.appendChild(list);
+
+    for (const file of curFiles) {
+      const listItem = document.createElement("li");
+      const para = document.createElement("p");
+      if (validFileType(file)) {
+        para.textContent = `File name ${file.name}, file size ${returnFileSize(
+          file.size,
+        )}.`;
+        const image = document.createElement("img");
+        image.src = URL.createObjectURL(file);
+        image.alt = image.title = file.name;
+
+        listItem.appendChild(image);
+        listItem.appendChild(para);
+      } else {
+        para.textContent = `File name ${file.name}: Not a valid file type. Update your selection.`;
+        listItem.appendChild(para);
+      }
+
+      list.appendChild(listItem);
+    }
+  }
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Image_types
+const fileTypes = [
+  "image/apng",
+  "image/bmp",
+  "image/gif",
+  "image/jpeg",
+  "image/pjpeg",
+  "image/png",
+  "image/svg+xml",
+  "image/tiff",
+  "image/webp",
+  "image/x-icon",
+];
+
+function validFileType(file) {
+  return fileTypes.includes(file.type);
+}
+
+function returnFileSize(number) {
+  if (number < 1024) {
+    return `${number} bytes`;
+  } else if (number >= 1024 && number < 1048576) {
+    return `${(number / 1024).toFixed(1)} KB`;
+  } else if (number >= 1048576) {
+    return `${(number / 1048576).toFixed(1)} MB`;
+  }
+}
+
+const button = document.querySelector("form button");
+button.addEventListener("click", (e) => {
+  e.preventDefault();
+  const para = document.createElement("p");
+  para.append("Image uploaded!");
+  preview.replaceChildren(para);
+});
+    </script>
