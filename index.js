@@ -309,7 +309,7 @@ async function main() {
     image=?
     WHERE id = ?`;
 
-    db.run(updateQuery, [formData.title, formData.year, formData.genre,imo,formData.id], function (err) {
+    db.run(updateQuery, [formData.title, formData.year, formData.genre,formData.imo,formData.id], function (err) {
       if (err) {
         console.log("oops")
         console.error("Error updating record:", err.message);
