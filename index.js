@@ -8,49 +8,51 @@ const cons = require('@ladjs/consolidate');
 const busboy = require('busboy');
 const fs = require('fs');
 
-function tic(io){
-    let serverTurn =0
-    let player=0
-    io.on('connection', (socket) => {
-        player++
-        //console.log(player)
-        io.emit("playernum",player)
-        console.log("player"+ player+"joined")
+function tic(io) {
+  let serverTurn = 0
+  let player = 0
+  io.on('connection', (socket) => {
+    player++
+    //console.log(player)
+    io.emit("playernum", player)
+    console.log("player" + player + "joined")
 
-        socket.on('board',(board) => {
-          io.emit('board',board)
-        })
-        socket.on('currentPlayer',(currentPlayer) => {
-          io.emit('currentPlayer',currentPlayer)
-        })
-        socket.on('row',(row) => {
-          io.emit('row',row)
-        })
-        socket.on('col',(col) => {
-          io.emit('col',col)
-        })
+    socket.on('board', (board) => {
+      io.emit('board', board)
+    })
+    socket.on('currentPlayer', (currentPlayer) => {
+      io.emit('currentPlayer', currentPlayer)
+    })
+    socket.on('row', (row) => {
+      io.emit('row', row)
+    })
+    socket.on('col', (col) => {
+      io.emit('col', col)
+    })
 
-        io.emit("turn",serverTurn)
-        socket.on('buttonpress', () => {
-            serverTurn++
-            io.emit('buttonstate', serverTurn);
-        });
-        socket.on('disconnect', (e) => {
-          player--
-          console.log(e)
-          console.log("player"+ player+"left");
-        });
-      })
+    io.emit("turn", serverTurn)
+    socket.on('buttonpress', () => {
+      serverTurn++
+      io.emit('buttonstate', serverTurn);
+    });
+    socket.on('disconnect', (e) => {
+      player--
+      console.log(e)
+      console.log("player" + player + "left");
+    });
+  })
 }
-async function movie(io ,db){
+async function movie(io, db) {
   await db.exec(`
   CREATE TABLE IF NOT EXISTS movie (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT,
     year INTEGER,
     genre TEXT
-  );
-`);
+  );`
+  
+);
+
 
 }
 
@@ -114,7 +116,7 @@ async function main() {
 
   await chat(io);
   tic(io)
-  await movie(io,db)
+  await movie(io, db)
 
   app.engine('html', cons.mustache);
   app.set('views', './views')
@@ -124,9 +126,9 @@ async function main() {
   app.use(express.static('public'));
   app.use(express.static('public/images'));
 
-  app.use(express.urlencoded({extended:true}))
+  app.use(express.urlencoded({ extended: true }))
 
-  app.get('/', (req, res) => {   
+  app.get('/', (req, res) => {
     res.sendFile(join(__dirname, 'projects/home/index.html'));
   });
 
@@ -171,15 +173,15 @@ async function main() {
     const bb = busboy({ headers: req.headers });
     bb.on('file', (name, file, info) => {
       const { filename, encoding, mimeType } = info;
-      const saveTo = join(__dirname, `images`,filename);
-      if(fs.existsSync(saveTo)){
+      const saveTo = join(__dirname, `images`, filename);
+      if (fs.existsSync(saveTo)) {
 
         res.end(`  <script>
         alert("these are not the droids you are looking for")
       </script>
       <a href="/">go back</a>`)
-      return
-      }else{
+        return
+      } else {
         const destination = fs.createWriteStream(saveTo);
         file.pipe(destination);
       }
@@ -194,7 +196,7 @@ async function main() {
       }).on('close', () => {
         console.log(`File [${name}] done`);
       });
-      imo=filename
+      imo = filename
     });
     bb.on('field', (name, val, info) => {
       console.log(`Field [${name}]: value: %j`, val);
@@ -223,7 +225,7 @@ async function main() {
       VALUES (?, ?, ?)`,
       title, year, genre// why is this not a array
     );
-    
+
     console.log(`result is ${result}`)
     res.redirect('/movies')
   });
@@ -240,7 +242,7 @@ async function main() {
     genre = ?
     WHERE id = ?`;
 
-    db.run(updateQuery, [title, year, genre,id], function (err) {
+    db.run(updateQuery, [title, year, genre, id], function (err) {
       if (err) {
         console.error("Error updating record:", err.message);
         res.status(500).send("Internal Server Error");
@@ -251,7 +253,7 @@ async function main() {
     });
 
     res.redirect("/movies");
-  
+
   });
   app.post("/movies_update2", (req, res) => {
     // const movie = req.body;
@@ -262,33 +264,59 @@ async function main() {
     const formData = {}; // Initialize an empty object to store form data
     const bb = busboy({ headers: req.headers });
     bb.on('file', (name, file, info) => {
-    const { filename, encoding, mimeType } = info;
-    const saveTo = join(__dirname, `public/images`,filename);
-      // if(fs.existsSync(saveTo)){
+      const { filename, encoding, mimeType } = info;
+      if (filename == null) {
+        const updateQuery = `
+        UPDATE movie
+        SET  title= ?,
+        year = ?,
+        genre = ?
+        WHERE id = ?`;
+        db.run(updateQuery, [formData.title, formData.year, formData.genre, formData.id], function (err) {
+          if (err) {
+            console.log("oops")
+            console.error("Error updating record:", err.message);
+            res.status(500).send("Internal Server Error");
+            return;
+          }
+          console.log(`Row(s) updated: ${this.changes}`);
+          res.send("Record updated successfully");
+        });
+        res.redirect("/movies");
 
-      //   res.end(`  <script>
-      //   alert("these are not the droids you are looking for")
-      // </script>
-      // <a href="/">go back</a>`)
-      // return
-      // }else{
-      //   const destination = fs.createWriteStream(saveTo);
-      //   file.pipe(destination);
-      // }
-      const destination = fs.createWriteStream(saveTo);
-      file.pipe(destination);
+        //res.end("no file given")
+      } else {
+        const saveTo = join(__dirname, `public/images`, filename);
+        const destination = fs.createWriteStream(saveTo);
+        file.pipe(destination);
+        const updateQuery = `
+        UPDATE movie
+        SET  title= ?,
+        year = ?,
+        genre = ?,
+        image=?
+        WHERE id = ?`;
+
+        db.run(updateQuery, [formData.title, formData.year, formData.genre, filename, formData.id], function (err) {
+          if (err) {
+            console.log("oops")
+            console.error("Error updating record:", err.message);
+            res.status(500).send("Internal Server Error");
+            return;
+          }
+          console.log(`Row(s) updated: ${this.changes}`);
+          res.send("Record updated successfully");
+        });
+      }
+
       console.log(
         `File [${name}]: filename: %j, encoding: %j, mimeType: %j`,
         filename,
         encoding,
         mimeType
       );
-      file.on('data', (data) => {
-        console.log(`File [${name}] got ${data.length} bytes`);
-      }).on('close', () => {
-        console.log(`File [${name}] done`);
-      });
-      imo=filename
+
+      imo = filename
     });
     bb.on('field', (name, val, info) => {
       console.log(`Field [${name}]: value: %j`, val);
@@ -301,34 +329,13 @@ async function main() {
       res.sendFile(join(__dirname, 'projects/home/index.html'));
       //res.writeHead(303, { Connection: 'close', Location: '/' });
       //res.end();
-      console.log(imo)
+      //console.log(filename)
       console.log('Form data:', formData);
-      //console.log(formData.age)
+      res.redirect("/movies");
 
-      const updateQuery = `
-    UPDATE movie
-    SET  title= ?,
-    year = ?,
-    genre = ?,
-    image=?
-    WHERE id = ?`;
-    debugger
-    db.run(updateQuery, [formData.title, formData.year, formData.genre,formData.imo,formData.id], function (err) {
-      if (err) {
-        console.log("oops")
-        console.error("Error updating record:", err.message);
-        res.status(500).send("Internal Server Error");
-        return;
-      }
-      console.log(`Row(s) updated: ${this.changes}`);
-      res.send("Record updated successfully");
     });
-
-    res.redirect("/movies");
-
-    });  
   });
-  
+
   const port = 3000;
   server.listen(port, () => {
     console.log(`server running at http://localhost:${port}`);

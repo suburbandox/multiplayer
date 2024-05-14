@@ -28,11 +28,11 @@
   <label for="genre">genre</label>
   <input type="text" id="genre" name="genre" value="{{movie.genre}}">
   <!-- <input type="text" id="fileName" name="fileNameDisplay" value="{{movie.image}}"> -->
-  <!-- <input type="file" name="image" accept="image/*" id="fileInput2"> -->
+  <input type="file" name="image" accept="image/*" id="fileInput2">
 
-  <input type="text" id="customInput" onclick="openFile()" readonly placeholder="Click to select file...">
+  <!-- <input type="text" id="customInput" onclick="openFile()" readonly placeholder="Click to select file...">
   <input type="file" name="image" id="fileInput" onchange="updateFileName()" style="display: none;">
-  <input type="text" name="imo" id="imo" value="{{movie.image}}">
+  <input type="text" name="imo" id="imo" value="{{movie.image}}"> -->
 
   <input type="submit" value="submit">
 </form>
@@ -49,6 +49,6 @@
     //imo.value="red"
     console.log(typeof imo.value)
   }
-  const imo = document.getElementById('imo');
-  console.log( imo.value)
+  //const imo = document.getElementById('imo');
+  //console.log( imo.value)
 </script>
