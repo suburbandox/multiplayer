@@ -162,9 +162,10 @@ async function main() {
       where id = ?
       `, req.params.id
     );
+    const genreResult = await db.all('select * from genre')
     //res.render('moviesupdate', { movie: result })
     console.log(result)
-    res.render('moviesupdate2', { movie: result })
+    res.render('moviesupdate2', { movie: result,genres:genreResult })
   });
 
   app.post('/upload', async (req, res) => {

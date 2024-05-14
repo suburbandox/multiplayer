@@ -26,7 +26,12 @@
   <label for="year">year</label>
   <input type="text" id="year" name="year" value="{{movie.year}}">
   <label for="genre">genre</label>
-  <input type="text" id="genre" name="genre" value="{{movie.genre}}">
+  <!-- <input type="text" id="genre" name="genre" value="{{movie.genre}}"> -->
+  <select name="genre" id="genre">
+    {{#genres}}
+      <option value="{{genre}}">{{genre}}</option>
+    {{/genres}}
+  </select>
   <!-- <input type="text" id="fileName" name="fileNameDisplay" value="{{movie.image}}"> -->
   <input type="file" name="image" accept="image/*" id="fileInput2">
 
