@@ -142,6 +142,10 @@ async function main() {
     res.sendFile(join(__dirname, 'projects/movie/movie.html'));
   });
 
+  app.get('/create_genre', (req, res) => {
+    res.sendFile(join(__dirname, 'projects/movie/genre.html'));
+  });
+
   app.get('/movies', async (req, res) => {
     const movies = await db.all('select * from movie')
     //res.render('movies', { movies })
@@ -258,8 +262,8 @@ async function main() {
     const formData = {}; // Initialize an empty object to store form data
     const bb = busboy({ headers: req.headers });
     bb.on('file', (name, file, info) => {
-      const { filename, encoding, mimeType } = info;
-      const saveTo = join(__dirname, `public/images`,filename);
+    const { filename, encoding, mimeType } = info;
+    const saveTo = join(__dirname, `public/images`,filename);
       // if(fs.existsSync(saveTo)){
 
       //   res.end(`  <script>
@@ -308,7 +312,7 @@ async function main() {
     genre = ?,
     image=?
     WHERE id = ?`;
-
+    debugger
     db.run(updateQuery, [formData.title, formData.year, formData.genre,formData.imo,formData.id], function (err) {
       if (err) {
         console.log("oops")

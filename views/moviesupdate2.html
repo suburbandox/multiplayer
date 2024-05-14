@@ -45,7 +45,10 @@
   function updateFileName() {
     const fileInput = document.getElementById('fileInput');
     const imo = document.getElementById('imo');
-    imo.value = fileInput.files[0] ? fileInput.files[0].name : 'No file selected';
+    imo.value = fileInput.files[0] ? fileInput.files[0].name :'No file selected';
     //imo.value="red"
+    console.log(typeof imo.value)
   }
+  const imo = document.getElementById('imo');
+  console.log( imo.value)
 </script>
