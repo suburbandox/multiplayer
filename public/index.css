@@ -14,10 +14,21 @@ body{
 }
 .navbar ul{
     list-style-type: none;
-    background-color: gray;
+    background-color: blue;
     padding: 0px;
     margin: auto;
     text-align: center;
+    position: relative;
+}
+.navbar ul ul li{
+    float:none;
+
+}
+.navbar ul ul {
+    display: none;
+    position: absolute;
+
+
 }
 .navbar a{
     color: white;
@@ -32,3 +43,6 @@ body{
 .navbar li{
     float: left;
 }
+.navbar ul :hover > ul{
+    display: block;
+    }

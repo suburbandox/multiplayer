@@ -337,6 +337,21 @@ async function main() {
     });
   });
 
+  app.post('/genre/create', async (req, res) => {
+    console.log(req.body)
+    console.log("blue")
+    const { genre } = req.body
+
+    const result = await db.run(`
+      INSERT INTO genre ( genre)
+      VALUES (?)`,
+      genre// why is this not a array
+    );
+
+    console.log(`result is ${result}`)
+    res.redirect('/movies')
+  });
+
   const port = 3000;
   server.listen(port, () => {
     console.log(`server running at http://localhost:${port}`);

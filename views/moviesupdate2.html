@@ -43,6 +43,9 @@
 </form>
 
 <script>
+
+  document.getElementById("genre").value = "{{movie.genre}}"
+  
   function openFile() {
     document.getElementById('fileInput').click(); // Programmatically trigger the file input click event
   }
